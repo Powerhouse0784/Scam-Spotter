@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ScamSpotter — a case file for suspicious messages</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#efe8da;--paper:#fbf7ee;--ink:#1c1a16;--mut:#6e675a;--line:#d9cfb9;--red:#c2321d;--grn:#2e7d4f;--amb:#b7791f;--sh:#1c1a16;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14120e;--paper:#1e1b15;--ink:#efe7d6;--mut:#a39a85;--line:#383225;--red:#ff6a52;--grn:#5fcf8b;--amb:#f0b34a;--sh:#000;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14120e;--paper:#1e1b15;--ink:#efe7d6;--mut:#a39a85;--line:#383225;--red:#ff6a52;--grn:#5fcf8b;--amb:#f0b34a;--sh:#000;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg) radial-gradient(var(--line) 1px,transparent 1.5px) 0 0/22px 22px;color:var(--ink);font:15px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+.wrap{max-width:1120px;margin:0 auto;padding:22px 18px 60px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font:700 22px Fraunces,Georgia,serif}
+.brand svg{width:34px;height:34px}
+.stats{display:flex;gap:8px;font:500 12px "IBM Plex Mono",monospace}
+.stats span{border:1.5px solid var(--ink);padding:3px 10px;border-radius:99px;background:var(--paper)}
+h1{font:700 clamp(34px,6.4vw,66px)/1.02 Fraunces,Georgia,serif;margin:34px 0 10px;letter-spacing:-.02em;max-width:14ch}
+h1 em{color:var(--red);font-weight:600}
+.lead{max-width:56ch;color:var(--mut);margin:0 0 28px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--paper);border:1.5px solid var(--ink);border-radius:6px;box-shadow:6px 6px 0 var(--sh);padding:22px 20px 20px;position:relative;min-width:0}
+.tag{position:absolute;top:-13px;left:16px;background:var(--ink);color:var(--paper);font:500 11px "IBM Plex Mono",monospace;letter-spacing:.1em;padding:3px 10px;border-radius:3px;text-transform:uppercase}
+label{display:block;font:500 12px "IBM Plex Mono",monospace;color:var(--mut);margin:14px 0 6px;text-transform:uppercase;letter-spacing:.06em}
+label:first-of-type{margin-top:4px}
+textarea,input{width:100%;border:1.5px solid var(--ink);border-radius:4px;background:var(--paper);color:var(--ink);font:14px/28px "IBM Plex Mono",monospace;padding:6px 12px}
+textarea{min-height:210px;resize:vertical;background-image:repeating-linear-gradient(transparent,transparent 27px,var(--line) 28px);background-attachment:local}
+input{line-height:1.6;padding:9px 12px}
+textarea:focus,input:focus,button:focus-visible{outline:3px solid var(--red);outline-offset:1px}
+.row{display:flex;gap:10px;align-items:center;margin-top:16px;flex-wrap:wrap}
+button{font:600 14px "IBM Plex Sans",sans-serif;cursor:pointer;border:1.5px solid var(--ink);border-radius:4px;padding:10px 16px;background:var(--paper);color:var(--ink)}
+button.go{background:var(--ink);color:var(--paper);box-shadow:4px 4px 0 var(--red);padding:12px 22px;font-size:15px}
+button.go:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--red)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:16px;font:500 12px "IBM Plex Mono",monospace;color:var(--mut)}
+.chips button{font:500 12px "IBM Plex Mono",monospace;padding:4px 10px;border-style:dashed}
+.err{color:var(--red);font-weight:600;margin-top:10px;min-height:20px}
+.empty{border:2px dashed var(--line);border-radius:6px;padding:46px 20px;text-align:center;color:var(--mut)}
+.empty b{display:block;font:700 26px Fraunces,Georgia,serif;color:var(--ink);margin-bottom:6px}
+.top2{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin:6px 0 18px}
+.stamp{display:inline-block;border:4px double var(--c);color:var(--c);padding:6px 16px;font:700 clamp(22px,4vw,30px) Fraunces,Georgia,serif;letter-spacing:.05em;text-transform:uppercase;transform:rotate(-5deg);border-radius:6px;animation:slam .45s cubic-bezier(.2,1.4,.4,1)}
+@keyframes slam{from{transform:rotate(-14deg) scale(2.3);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+@media(prefers-reduced-motion:reduce){.stamp{animation:none}.pin{transition:none!important}}
+.num b{font:700 56px/1 Fraunces,Georgia,serif}.num span{font:500 12px "IBM Plex Mono",monospace;color:var(--mut);margin-left:4px}
+.meter{position:relative;height:12px;border:1.5px solid var(--ink);border-radius:99px;background:linear-gradient(90deg,var(--grn),var(--amb) 50%,var(--red));margin:14px 0 20px}
+.pin{position:absolute;top:-8px;width:5px;height:26px;background:var(--ink);transform:translateX(-50%);border-radius:2px;transition:left .7s cubic-bezier(.3,1.3,.5,1)}
+.sum{font:600 17px/1.4 Fraunces,Georgia,serif;margin:0 0 6px}
+h3{font:500 12px "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.1em;color:var(--mut);margin:24px 0 8px;border-bottom:1px dashed var(--line);padding-bottom:5px}
+.doc{white-space:pre-wrap;word-break:break-word;font:13.5px/1.8 "IBM Plex Mono",monospace;border:1px dashed var(--mut);padding:12px;border-radius:4px;max-height:260px;overflow:auto}
+mark{background:color-mix(in srgb,var(--c) 34%,transparent);border-bottom:2px solid var(--c);color:inherit;padding:0 1px;border-radius:2px}
+.bd{display:grid;grid-template-columns:150px 1fr 40px;gap:8px;align-items:center;font:12px "IBM Plex Mono",monospace;margin:5px 0}
+.bd i{display:block;height:8px;border-radius:99px;background:var(--c)}.bd div{background:var(--line);border-radius:99px;overflow:hidden}
+@media(max-width:420px){.bd{grid-template-columns:104px 1fr 34px}}
+.f{border-left:4px solid var(--c);padding:6px 12px;margin:9px 0;background:color-mix(in srgb,var(--c) 7%,transparent)}
+.f b{display:block}.f p{margin:2px 0;color:var(--mut);font-size:13.5px}
+.f code{font:12px "IBM Plex Mono",monospace;background:color-mix(in srgb,var(--c) 22%,transparent);padding:1px 6px;border-radius:3px;word-break:break-all}
+.act{margin:0;padding-left:20px}.act li{margin:5px 0}
+.links{display:flex;flex-direction:column;gap:5px}
+.lk{display:flex;justify-content:space-between;gap:10px;font:12.5px "IBM Plex Mono",monospace;border:1px solid var(--line);padding:5px 10px;border-radius:4px}
+.lk span{word-break:break-all}.lk b{white-space:nowrap}
+.sec{margin-top:54px}
+.sec h2{font:700 clamp(26px,4vw,38px)/1.1 Fraunces,Georgia,serif;margin:0 0 6px}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:26px}
+@media(max-width:860px){.plans{grid-template-columns:1fr}}
+.plan h4{font:700 22px Fraunces,Georgia,serif;margin:0}.plan .pr{font:700 34px Fraunces,Georgia,serif;margin:6px 0}.plan .pr small{font:500 12px "IBM Plex Mono",monospace;color:var(--mut)}
+.plan ul{padding-left:18px;margin:8px 0 0}.plan li{margin:4px 0}.plan.hot{background:var(--ink);color:var(--paper)}.plan.hot li::marker{color:var(--red)}.plan.hot .pr small{color:inherit;opacity:.7}
+.hl{display:flex;justify-content:space-between;gap:10px;font:12.5px "IBM Plex Mono",monospace;border-bottom:1px dashed var(--line);padding:6px 0}
+.hl em{font-style:normal;color:var(--mut)}
+.foot{margin-top:46px;font:12px "IBM Plex Mono",monospace;color:var(--mut);text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 18px;border-radius:99px;font:500 13px "IBM Plex Mono",monospace;opacity:0;pointer-events:none;transition:opacity .25s}
+#toast.on{opacity:1}
+nav.nv{display:flex;gap:6px;flex-wrap:wrap;font:500 12px "IBM Plex Mono",monospace}
+nav.nv a{color:var(--ink);text-decoration:none;border:1.5px solid transparent;padding:4px 10px;border-radius:99px}
+nav.nv a:hover{border-color:var(--ink);background:var(--paper)}
+.ai{margin-top:22px;border:1.5px dashed var(--ink);border-radius:6px;padding:14px;background:color-mix(in srgb,#7c5cf0 8%,transparent)}
+.ai>h3:first-child{margin-top:0}
+select{font:500 13px "IBM Plex Mono",monospace;padding:10px;border:1.5px solid var(--ink);border-radius:4px;background:var(--paper);color:var(--ink)}
+.badge{display:inline-block;font:700 13px "IBM Plex Mono",monospace;padding:2px 10px;border-radius:99px;border:1.5px solid currentColor;margin-right:8px}
+.box{border:1px solid var(--line);border-radius:4px;padding:10px 12px;margin:8px 0;font:13px/1.6 "IBM Plex Mono",monospace;white-space:pre-wrap;background:var(--paper)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--ink);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px;margin-right:8px}@keyframes sp{to{transform:rotate(360deg)}}
+.lg{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:30px}
+@media(max-width:860px){.lg{grid-template-columns:1fr}}
+.lg h4{font:700 20px Fraunces,Georgia,serif;margin:0 0 4px}.lg p{margin:8px 0;font-size:14px}.lg b{font:500 11px "IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--red)}
+</style></head><body>
+<div class="wrap">
+<div class="top">
+ <div class="brand"><svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3"><circle cx="17" cy="17" r="11"/><path d="M25 25l11 11" stroke-linecap="round"/><path d="M12 17l4 4 7-8" stroke="var(--red)" stroke-linecap="round" stroke-linejoin="round"/></svg>ScamSpotter</div>
+ <nav class="nv"><a href="#scanner">Scanner</a><a href="#learn">Learn</a><a href="#pricing">Plans</a></nav>
+ <div class="stats"><span>scans: <b id="sN">0</b></span><span>flagged: <b id="sF">0</b></span></div>
+</div>
+<h1>Is this a scam? <em>Let’s check the evidence.</em></h1>
+<p class="lead">Paste any SMS, email, DM or link. ScamSpotter marks up the manipulation tactics, inspects every link and sender, and hands down a verdict in under a second. The rule engine runs in your browser; Gemini is contacted only if you ask for a second opinion.</p>
+
+<div class="grid" id="scanner">
+ <section class="card"><span class="tag">Exhibit A · the evidence</span>
+  <label for="txt">Message, email or link</label>
+  <textarea id="txt" placeholder="Paste the suspicious text here…" spellcheck="false"></textarea>
+  <label for="snd">Sender (optional) — email, domain or phone number</label>
+  <input id="snd" placeholder="e.g. support@secure-bank-alerts.xyz or +91 91234 56780" autocomplete="off" spellcheck="false">
+  <div class="err" id="err" role="alert"></div>
+  <div class="row"><button class="go" id="go">Run analysis →</button><button id="rs">Clear</button></div>
+  <div class="chips">Test with a sample: <button data-s="0">Bank KYC SMS</button><button data-s="1">Job offer</button><button data-s="2">Genuine delivery note</button></div>
+ </section>
+ <section class="card"><span class="tag">Exhibit B · the verdict</span>
+  <div id="out" aria-live="polite"><div class="empty"><b>Awaiting evidence</b>Paste something on the left and press <em>Run analysis</em>.</div></div>
+ </section>
+</div>
+
+<div class="grid sec">
+ <section class="card"><span class="tag">Case history · this device</span>
+  <div id="hist"></div><div class="row"><button id="clr">Clear history</button></div>
+ </section>
+ <section class="card"><span class="tag">How the verdict works</span>
+  <p style="margin-top:4px">Each tactic found is a signal with its own weight. Signals are combined so that several independent red flags compound, while a single weak one never tips a message into “scam”.</p>
+  <ul class="act"><li><b>Language</b> — urgency, threats, secrecy, prizes, fee demands, credential requests.</li><li><b>Links</b> — IP hosts, shorteners, punycode, look-alike brand domains, risky endings, credentials-in-URL.</li><li><b>Sender</b> — brand look-alikes, free-mail impersonation, banks texting from mobile numbers.</li></ul>
+ </section>
+</div>
+
+<div class="sec" id="learn"><h2>Know the playbook.</h2><p class="lead" style="margin-bottom:0">Six scams behind most losses in India. Learn the shape and the message stops working on you.</p><div class="lg"><div class="card"><span class="tag">01</span><h4>Digital arrest</h4><p>A caller in “police” or “CBI” uniform on video says you’re linked to a crime or parcel.</p><p><b>Spot it</b><br>Video-call officers, orders to stay on the line, a “verification” transfer.</p><p><b>Do this</b><br>No agency arrests by video call. Hang up and call 1930.</p></div><div class="card"><span class="tag">02</span><h4>KYC &amp; SIM-block SMS</h4><p>A text says your account or SIM will be blocked today unless you update details.</p><p><b>Spot it</b><br>A link plus a deadline, from a mobile number or odd domain.</p><p><b>Do this</b><br>Never tap it. Open the official app or type the bank’s address yourself.</p></div><div class="card"><span class="tag">03</span><h4>Fake jobs &amp; task scams</h4><p>Easy pay for likes, reviews or “tasks”, usually on Telegram or WhatsApp.</p><p><b>Spot it</b><br>Pay-to-start fees, early small payouts, then bigger “deposits”.</p><p><b>Do this</b><br>Real employers never charge to hire you. Stop at the first fee.</p></div><div class="card"><span class="tag">04</span><h4>UPI collect &amp; QR tricks</h4><p>Someone “sends” money by asking you to scan a QR or approve a request.</p><p><b>Spot it</b><br>You’re asked for your UPI PIN to “receive” money.</p><p><b>Do this</b><br>You never enter a PIN to receive money. Decline the request.</p></div><div class="card"><span class="tag">05</span><h4>Courier &amp; customs fees</h4><p>A parcel is “held” until you pay a small clearance fee.</p><p><b>Spot it</b><br>A parcel you didn’t expect, a payment link, a courier lookalike.</p><p><b>Do this</b><br>Track via the courier’s official site. Don’t pay through links.</p></div><div class="card"><span class="tag">06</span><h4>Investment &amp; crypto groups</h4><p>A group admin shares profit screenshots and guaranteed returns.</p><p><b>Spot it</b><br>Guaranteed profit, pressure to top up, withdrawal “taxes”.</p><p><b>Do this</b><br>Verify SEBI registration. No honest investment guarantees returns.</p></div></div></div>
+<div class="sec" id="pricing"><h2>Free for people. Paid for protection at scale.</h2>
+<p class="lead" style="margin-bottom:0">Individuals get the verdict for free; the money comes from families who want more cover and from institutions that need their people trained and protected.</p>
+<div class="plans">
+ <div class="card plan"><span class="tag">Free</span><h4>Spotter</h4><div class="pr">₹0</div><ul><li>Unlimited text &amp; link checks</li><li>Highlighted tactics and clear actions</li><li>Private, on-device analysis</li></ul></div>
+ <div class="card plan hot"><span class="tag">Pro</span><h4>Family Shield</h4><div class="pr">₹149 <small>/ month · up to 5 people</small></div><ul><li>Screenshot, QR and voice-note checks</li><li>Alert a trusted family member on high-risk scans</li><li>Live feed of new scams in your region</li></ul></div>
+ <div class="card plan"><span class="tag">Campus</span><h4>College licence</h4><div class="pr">₹40 <small>/ student / year</small></div><ul><li>Admin dashboard of scam trends on campus</li><li>Awareness reports for cyber-safety cells</li><li>Branded portal for students &amp; staff</li></ul></div>
+</div>
+<p class="lead" style="margin-top:18px">Value versus cost: a single scam avoided costs victims far more than a year of Pro, and a campus licence costs less than one chai per student per month.</p></div>
+
+<div class="foot">If you have already lost money, call the national cybercrime helpline <b>1930</b> or file a report at cybercrime.gov.in. ScamSpotter flags patterns — it can’t guarantee a message is genuine.</div>
+</div>
+<div id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s),out=$("#out"),txt=$("#txt"),snd=$("#snd"),err=$("#err");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const CATS={urgency:["Urgency & pressure","#d99a00"],cred:["Credential theft","#e5484d"],pretext:["Fake pretext","#e07b39"],money:["Money request","#d6409f"],threat:["Threats","#a63fb5"],bait:["Too good to be true","#3b82c4"],secret:["Secrecy & off-platform","#7c5cf0"],link:["Suspicious link","#d9480f"],sender:["Sender","#0d9488"],brand:["Trusted-name claim","#7a7467"]};
+const BR=/\b(sbi|hdfc|icici|axis bank|kotak|paytm|phonepe|google pay|amazon|flipkart|netflix|income tax|irs|aadhaar|uidai|trai|rbi|fedex|dhl|india post|bluedart|paypal|microsoft|apple|customs|police|cbi|customer care)\b/i;
+const R=[
+["cred",.6,/\b(share|send|enter|provide|confirm|verify|tell|give|reply with|submit)\b[^.\n]{0,40}\b(otp|cvv|pin|password|passcode|card number|aadhaar|pan|seed phrase|recovery phrase|upi pin)\b/,"Asks for a secret code or credential","No real bank, company or government body ever asks you to share an OTP, PIN or password."],
+["urgency",.3,/\b(urgent(ly)?|immediately|right away|within \d+ ?(hours?|hrs?|minutes?|mins?)|expires? (today|soon|in)|last (chance|warning)|act now|final notice|today only|hurry|asap|limited time)\b/,"Manufactured urgency","Scammers rush you so you act before you think."],
+["threat",.42,/\b(account (will be |has been |is )?(suspended|blocked|closed|locked|deactivated|frozen)|(legal|police) action|arrest(ed)?|warrant|court (case|notice)|sim (will be )?(blocked|deactivated)|disconnect(ed|ion)|penalty)\b/,"Threat of loss or punishment","Fear is the oldest scam lever. Genuine notices don’t threaten you by text."],
+["pretext",.35,/\b(kyc|verify your (account|identity|details)|update your (kyc|pan|details|account|information)|confirm your (account|identity)|re-?activate|unusual (activity|sign[- ]?in)|suspicious (activity|login))\b/,"Account-verification pretext","“Verify now” messages are the classic phishing opener."],
+["bait",.45,/\b(you(['’]ve| have| are) (won|been selected|been chosen)|congratulations|lottery|lucky (draw|winner)|prize|jackpot|cashback of|claim your (reward|prize|gift|refund)|free (gift|iphone|recharge)|refund (is )?(pending|waiting))\b/,"Unexpected reward","You can’t win a contest you never entered."],
+["money",.5,/\b(gift ?cards?|itunes|google play card|bitcoin|btc|usdt|crypto(currency)?|wire transfer|western union|moneygram|upi (collect|request)|scan (the )?qr|processing fee|registration fee|security deposit|advance (fee|payment)|customs (fee|duty|charges?)|pay (a )?(small )?fee)\b/,"Asks for an unusual payment","Upfront fees, gift cards, crypto and QR “receive money” tricks are how scammers cash out."],
+["bait",.42,/\b(work from home|earn (up to )?(₹|rs\.?|inr|\$)? ?\d[\d,]*\s?(per|a|\/) ?(day|hour|week)|no experience (needed|required)|data entry job|task(s)? (to|and) earn|like (and|&) (subscribe|review))\b/,"Too-good-to-be-true job","Easy money for no skill is a recruitment-scam signature."],
+["bait",.45,/\b(guaranteed (income|returns?|profit)|double your (money|investment)|\d{2,3}% (returns?|profit) (daily|weekly|monthly)|risk[- ]free|insider tip|trading group)\b/,"Guaranteed-return investment","No legitimate investment guarantees profit."],
+["secret",.3,/\b(don['’]t (tell|share|inform)|keep (this|it) (a )?(secret|confidential)|do not (tell|share|disclose))\b/,"Asks for secrecy","Scammers isolate you so no one can warn you."],
+["secret",.15,/\b(contact|message|text|whatsapp|telegram|call)\b[^.\n]{0,30}\+?\d[\d\s-]{9,}/,"Pushes you to an off-platform number","Moving you to a private chat removes the platform’s protections."],
+["brand",.12,BR.source?BR:BR,"Names a trusted brand or authority","Not a red flag alone — but impersonation needs a trusted name. Check whether it fits the rest of the message."],
+["pretext",.15,/\bdear (customer|user|sir|madam|account holder|valued (customer|member))\b/,"Generic greeting","Real providers usually know your name."]
+];
+const BRANDS={sbi:["sbi.co.in","onlinesbi.sbi","sbi.bank.in"],hdfc:["hdfcbank.com","hdfc.com"],icici:["icicibank.com"],axis:["axisbank.com"],kotak:["kotak.com"],paytm:["paytm.com"],phonepe:["phonepe.com"],amazon:["amazon.in","amazon.com"],flipkart:["flipkart.com"],netflix:["netflix.com"],paypal:["paypal.com"],microsoft:["microsoft.com"],apple:["apple.com"],google:["google.com"],facebook:["facebook.com"],instagram:["instagram.com"],whatsapp:["whatsapp.com","wa.me"],fedex:["fedex.com"],dhl:["dhl.com"],indiapost:["indiapost.gov.in"],incometax:["incometax.gov.in"],uidai:["uidai.gov.in"]};
+const SHORT=/^(bit\.ly|tinyurl\.com|t\.co|goo\.gl|cutt\.ly|rb\.gy|is\.gd|shorturl\.at|ow\.ly|tiny\.cc)$/;
+const SUS=/\.(xyz|top|click|icu|buzz|vip|link|live|site|online|cc|zip|mov|tk|ml|ga|cf|gq|rest|monster|work|support)$/;
+const FREE=/^(gmail|yahoo|outlook|hotmail|rediffmail|proton)\./;
+const URLRE=/(?:https?:\/\/|www\.)[^\s<>"'‘’“”)]+|\b(?:bit\.ly|tinyurl\.com|t\.co|goo\.gl|cutt\.ly|rb\.gy|is\.gd|shorturl\.at|wa\.me)\/[^\s]+|\b[a-z0-9-]+(?:\.[a-z0-9-]+)*\.(?:xyz|top|click|icu|buzz|vip|link|live|site|online|cc|zip|mov|tk|ml|ga|cf|gq|rest|monster)\b[^\s]*/gi;
+const SAMPLES=[`Dear Customer, your SBI account will be blocked today. Update your KYC immediately: http://sbi-kyc-update.xyz/login and share the OTP to avoid legal action.`,`Work from home! Earn ₹5,000 per day, no experience required. Pay a ₹499 registration fee to start. Don’t tell anyone, message us on WhatsApp +91 91234 56780`,`Hi Riya, your order from Amazon has been shipped and will arrive on Tuesday. You can track it in the Amazon app under Your Orders.`];
+function hostBrand(h){const seg=h.split(/[.\-]/);for(const k in BRANDS){if(seg.some(s=>s===k||(s.startsWith(k)&&s.length<=k.length+8))&&!BRANDS[k].some(o=>h===o||h.endsWith("."+o)))return k}return null}
+function urlSignals(raw){const S=[];let u;try{u=new URL(/^https?:\/\//i.test(raw)?raw:"https://"+raw)}catch(e){return{host:raw,S:[["link",.3,"Malformed link","The link can’t be parsed, which is itself unusual."]]}}
+const h=u.hostname.toLowerCase(),add=(w,t,y)=>S.push(["link",w,t,y]);
+if(/^\d{1,3}(\.\d{1,3}){3}$/.test(h))add(.6,"Link points to a raw IP address","Legitimate services use domain names, not numbers.");
+if(SHORT.test(h))add(.35,"Shortened link hides the destination","You can’t see where it really leads.");
+if(h.includes("xn--"))add(.5,"Look-alike (punycode) domain","Foreign characters can imitate real brand names.");
+if(u.username)add(.5,"Credentials-in-URL trick","Text before the @ is a decoy; the real site comes after it.");
+if(/^http:\/\//i.test(raw))add(.2,"Not using HTTPS","Sensitive pages should always be encrypted.");
+if(SUS.test(h))add(.35,"Risky domain ending","Cheap endings like .xyz or .top are heavily used for throwaway scam sites.");
+if(h.split(".").length>=5)add(.25,"Excessive subdomains","Long chains of subdomains disguise the real domain.");
+if((h.match(/-/g)||[]).length>=3)add(.25,"Hyphen-stuffed domain","Scam domains often chain words with hyphens.");
+const b=hostBrand(h);if(b)add(.65,`Imitates “${b}”`,`This domain is not an official ${b} address, yet uses its name.`);
+if(/(login|signin|verify|secure|update|kyc|wallet|claim|bonus|reward|refund|confirm)/.test(h))add(.25,"Urgent keywords in the domain","Words like “verify” or “secure” in a domain are a phishing habit.");
+else if(/(login|signin|verify|kyc|claim|refund|otp)/.test(u.pathname.toLowerCase()))add(.1,"Login or claim page in the path","Check that the site itself is the official one.");
+if(raw.length>110)add(.1,"Unusually long link","Long links hide tracking and redirect tricks.");
+return{host:h,S}}
+const nor=a=>1-a.reduce((p,w)=>p*(1-w),1);
+function analyze(text,sender){const F=[],M=[],L=[];
+R.forEach(([cat,w,re,title,why])=>{const g=new RegExp(re.source,"gi");let m,n=0,first;while((m=g.exec(text))){n++;first=first||m[0];M.push({s:m.index,e:m.index+m[0].length,cat,title});if(!m[0].length)g.lastIndex++}if(n)F.push({cat,w:Math.min(.85,w+(n>1?.05:0)),title,why,ev:first})});
+const lt=text.replace(/[^A-Za-z]/g,"");if(lt.length>=25&&lt.replace(/[^A-Z]/g,"").length/lt.length>.5)F.push({cat:"urgency",w:.15,title:"Shouting in capitals",why:"ALL CAPS is used to create panic.",ev:"mostly capital letters"});
+if((text.match(/!/g)||[]).length>=3)F.push({cat:"urgency",w:.1,title:"Excessive exclamation marks",why:"Hype and alarm punctuation is common in scam copy.",ev:"!!!"});
+[...new Set((text.match(URLRE)||[]).map(u=>u.replace(/[.,;:!?]+$/,"")))].slice(0,8).forEach(u=>{const{host,S}=urlSignals(u);const i=text.indexOf(u);if(i>=0)M.push({s:i,e:i+u.length,cat:"link",title:"Link"});S.forEach(([cat,w,title,why])=>F.push({cat,w,title,why,ev:host}));L.push({u,host,score:Math.round(nor(S.map(x=>x[1]))*100)})});
+if(sender){const s=sender.trim().toLowerCase(),em=s.match(/@([a-z0-9.-]+\.[a-z]{2,})/),h=em?em[1]:(/^[a-z0-9.-]+\.[a-z]{2,}$/.test(s)?s:null);
+if(!h&&/^\+?[\d\s-]{10,}$/.test(s)&&BR.test(text))F.push({cat:"sender",w:.25,title:"Brand message from a mobile number",why:"Banks and couriers send alerts from registered sender IDs, not personal numbers.",ev:sender});
+if(h){const b=hostBrand(h);if(b)F.push({cat:"sender",w:.6,title:`Sender imitates “${b}”`,why:"The sender’s domain is not official for that brand.",ev:h});else if(SUS.test(h))F.push({cat:"sender",w:.3,title:"Sender uses a risky domain",why:"Throwaway domain endings are common in phishing.",ev:h});else if(FREE.test(h)&&BR.test(text))F.push({cat:"sender",w:.35,title:"Brand message from a free mailbox",why:"Companies write from their own domain, not Gmail or Yahoo.",ev:h})}}
+F.sort((a,b)=>b.w-a.w);return{F,M,L}}
+const LV=[[20,"Looks safe","var(--grn)","No known scam patterns found. Still verify anything that involves money or logins."],[45,"Caution","var(--amb)","A few warning signs. Don’t act until you verify through an official channel."],[70,"Suspicious","#d9480f","Several scam tactics at once. Treat it as hostile until proven otherwise."],[101,"Likely scam","var(--red)","This matches classic scam playbooks. Don’t click, reply or pay."]];
+function hl(t,M){M.sort((a,b)=>a.s-b.s||b.e-a.e);let p=0,o="";for(const m of M){if(m.s<p)continue;o+=esc(t.slice(p,m.s))+`<mark style="--c:${CATS[m.cat][1]}" title="${esc(m.title)}">${esc(t.slice(m.s,m.e))}</mark>`;p=m.e}return o+esc(t.slice(p))}
+let report="";
+function render(text,sender,r){const{F,M,L}=r,score=Math.min(99,Math.round(nor(F.map(f=>f.w))*100)||(F.length?1:2)),lv=LV.find(l=>score<l[0]),cats={};
+F.forEach(f=>(cats[f.cat]=cats[f.cat]||[]).push(f.w));const bd=Object.entries(cats).map(([k,v])=>[k,Math.round(nor(v)*100)]).sort((a,b)=>b[1]-a[1]);
+const has=k=>!!cats[k],A=[];
+if(has("cred"))A.push("Never share OTPs, PINs or passwords — nobody legitimate will ask.");
+if(has("link")||L.length)A.push("Don’t open the link. Go to the official app or type the website address yourself.");
+if(has("money")||has("bait"))A.push("Don’t pay anything upfront. Real prizes, refunds and jobs never charge a fee.");
+if(has("threat")||has("pretext"))A.push("Call the organisation on the number printed on your card, bill or official site.");
+if(score>=45)A.push("Block the sender, then report it at cybercrime.gov.in or call 1930 (India).");
+if(!A.length)A.push("Looks fine, but if it asks for money or logins, verify through the official app first.");
+const sums=F.map(f=>`- [${CATS[f.cat][0]}] ${f.title}: ${f.ev}`).join("\n");
+report=`ScamSpotter verdict: ${lv[1].toUpperCase()} (${score}/100 risk)\n\n${lv[3]}\n\nSignals found:\n${sums||"- none"}\n\nWhat to do:\n${A.map(a=>"- "+a).join("\n")}`;
+out.innerHTML=`<div class="top2"><div class="stamp" style="--c:${lv[2]}">${lv[1]}</div><div class="num"><b>${score}</b><span>/100 risk</span></div></div>
+<div class="meter"><i class="pin" style="left:${score}%"></i></div><p class="sum">${lv[3]}</p>
+${text?`<h3>Marked-up evidence</h3><div class="doc">${hl(text,M)}</div>`:""}
+${L.length?`<h3>Links inspected (${L.length})</h3><div class="links">${L.map(l=>`<div class="lk"><span>${esc(l.host)}</span><b style="color:${l.score>=45?"var(--red)":l.score>=20?"var(--amb)":"var(--grn)"}">${l.score>=45?"RISKY":l.score>=20?"CHECK":"OK"} · ${l.score}</b></div>`).join("")}</div>`:""}
+${bd.length?`<h3>Tactic breakdown</h3>${bd.map(([k,v])=>`<div class="bd" style="--c:${CATS[k][1]}"><span>${CATS[k][0]}</span><div><i style="width:${Math.max(6,v)}%"></i></div><b>${v}%</b></div>`).join("")}`:""}
+${F.length?`<h3>Findings (${F.length})</h3>${F.map(f=>`<div class="f" style="--c:${CATS[f.cat][1]}"><b>${esc(f.title)}</b><p>${esc(f.why)}</p><code>${esc(f.ev)}</code></div>`).join("")}`:`<h3>Findings</h3><p>No known scam patterns found. That’s a good sign, not a guarantee.</p>`}
+<h3>What to do next</h3><ol class="act">${A.map(a=>`<li>${esc(a)}</li>`).join("")}</ol>
+<div class="row"><button class="go" id="cp">Copy report</button><button id="aib">✦ Gemini second opinion</button><select id="lng" aria-label="Language for the AI explanation"><option>English</option><option>Hindi</option><option>Hinglish</option><option>Urdu</option><option>Bengali</option><option>Tamil</option><option>Telugu</option><option>Marathi</option></select></div><div id="ai"></div>`;
+$("#cp").onclick=copy;$("#aib").onclick=askAI;return{score,label:lv[1]}}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),1800)}
+function copy(){const done=()=>toast("Report copied");if(navigator.clipboard)navigator.clipboard.writeText(report).then(done,fb);else fb();function fb(){const a=document.createElement("textarea");a.value=report;document.body.appendChild(a);a.select();try{document.execCommand("copy");done()}catch(e){toast("Copy failed")}a.remove()}}
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function drawHist(){const h=store.get("ss.h",[]),s=store.get("ss.s",{n:0,f:0});$("#sN").textContent=s.n;$("#sF").textContent=s.f;
+$("#hist").innerHTML=h.length?h.map(x=>`<div class="hl"><span>${esc(x.sn)}</span><em>${esc(x.l)} · ${x.sc}</em></div>`).join(""):`<p style="color:var(--mut);margin:4px 0">No scans yet. Your last 20 appear here — stored only on this device.</p>`}
+function scan(){err.textContent="";const text=txt.value.trim(),sender=snd.value.trim();
+if(!text&&!sender){err.textContent="Paste a message, email or link first.";txt.focus();return}
+if(text&&text.length<8&&!URLRE.test(text)){err.textContent="That’s too short to judge — paste the full message.";return}
+URLRE.lastIndex=0;const r=analyze(text,sender),v=render(text,sender,r);CTX={text,sender,r,v};
+const h=store.get("ss.h",[]);h.unshift({sn:(text||sender).replace(/\s+/g," ").slice(0,56),l:v.label,sc:v.score});store.set("ss.h",h.slice(0,20));
+const s=store.get("ss.s",{n:0,f:0});s.n++;if(v.score>=45)s.f++;store.set("ss.s",s);drawHist();
+if(innerWidth<860)out.scrollIntoView({behavior:"smooth",block:"start"})}
+$("#go").onclick=scan;txt.addEventListener("keydown",e=>{if(e.key==="Enter"&&(e.ctrlKey||e.metaKey))scan()});
+$("#rs").onclick=()=>{txt.value="";snd.value="";err.textContent="";out.innerHTML=`<div class="empty"><b>Awaiting evidence</b>Paste something on the left and press <em>Run analysis</em>.</div>`};
+document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{txt.value=SAMPLES[b.dataset.s];snd.value=b.dataset.s==="0"?"+91 98765 43210":"";scan()});
+$("#clr").onclick=()=>{store.set("ss.h",[]);store.set("ss.s",{n:0,f:0});drawHist()};
+drawHist();
+let CTX=null;
+function setScore(n){const lv=LV.find(l=>n<l[0]),st=$(".stamp");st.textContent=lv[1];st.style.setProperty("--c",lv[2]);$(".num b").textContent=n;$(".pin").style.left=n+"%";$(".sum").textContent=lv[3]}
+function copyText(t){const ok=()=>toast("Copied");if(navigator.clipboard)navigator.clipboard.writeText(t).then(ok,()=>toast("Copy failed"));else toast("Copy failed")}
+async function askAI(){if(!CTX)return;const box=$("#ai"),btn=$("#aib");btn.disabled=true;
+box.innerHTML=`<div class="ai"><span class="spin"></span>Gemini is reading the message…</div>`;
+try{const r=await fetch("/api/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text:CTX.text,sender:CTX.sender,lang:$("#lng").value,signals:CTX.r.F.slice(0,12).map(f=>f.title+": "+f.ev)})});
+const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||"Request failed ("+r.status+").");showAI(d)}
+catch(e){box.innerHTML=`<div class="ai"><b>Gemini isn’t available right now.</b><p style="margin:6px 0 0">${esc(e.message)} The rule-based verdict above still stands.</p></div>`}
+btn.disabled=false}
+function showAI(d){const L=a=>(Array.isArray(a)?a:[]).map(x=>`<li>${esc(x)}</li>`).join(""),c=d.verdict==="SCAM"?"var(--red)":d.verdict==="SUSPICIOUS"?"var(--amb)":"var(--grn)",
+ai=d.verdict==="SCAM"?d.confidence:d.verdict==="SUSPICIOUS"?Math.round(d.confidence*.6):100-d.confidence,
+comb=Math.min(99,Math.max(1,Math.round(CTX.v.score*.4+ai*.6)));setScore(comb);
+report+=`\n\nGemini second opinion: ${d.verdict} (${d.confidence}% sure) — ${d.scam_type}\n${d.summary}`;
+$("#ai").innerHTML=`<div class="ai"><h3>✦ Gemini second opinion</h3><span class="badge" style="color:${c}">${esc(d.verdict)} · ${d.confidence}% sure</span><b>${esc(d.scam_type)}</b>${d.impersonated_entity&&!/^(none|n\/a|unknown)$/i.test(d.impersonated_entity)?` <span style="color:var(--mut)">· posing as ${esc(d.impersonated_entity)}</span>`:""}
+<p class="sum" style="margin-top:12px">${esc(d.summary)}</p>
+<h3>Red flags</h3><ul class="act">${L(d.red_flags)}</ul><h3>What to do</h3><ol class="act">${L(d.what_to_do)}</ol>
+<h3>Safe reply</h3><div class="box">${esc(d.safe_reply)}</div><button id="c1">Copy reply</button>
+<h3>Complaint draft for cybercrime.gov.in</h3><div class="box">${esc(d.complaint)}</div><button id="c2">Copy complaint</button>
+<p style="color:var(--mut);font-size:13px;margin-bottom:0">Risk score updated to ${comb}/100 by blending the rule engine (${CTX.v.score}) with Gemini’s read (${ai}).</p></div>`;
+$("#c1").onclick=()=>copyText(d.safe_reply);$("#c2").onclick=()=>copyText(d.complaint)}
+</script></body></html>
